@@ -1,6 +1,11 @@
 #################################################################
 #####  Results - Summary of HIGH-RISK bites   ######
 #################################################################
+
+# TO DO 
+# CS to check if deid data is correct and uptodate (Katie wrote code and tested on older data)
+# Remove any investigation code if not being used to simplify repo
+
 rm(list=ls()) # Clean workspace
 
 library(dplyr)

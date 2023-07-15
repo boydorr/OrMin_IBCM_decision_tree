@@ -1,6 +1,8 @@
 #############################################################
 #####  Code for Economic Analysis #####
 #############################################################
+# TO DO:
+# CS to update file to include calculations requested from R3
 rm(list=ls())
 
 # Import libraries & source functions
