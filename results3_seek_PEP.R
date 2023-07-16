@@ -45,10 +45,10 @@ write.csv(pSeekDF, "outputs/Prob_Seek_PEP.csv")
 
 paste0("We estimated the probability of rabies exposures seeking PEP over this three year period as ", 
        round(subset(pSeekDF, Year=="overall")$pPEP, 3), " ranging from ", 
-       round(subset(pSeekDF, Year=="2020")$pPEP, 3), " (95%CI: ", 
+       round(subset(pSeekDF, Year=="2020")$pPEP, 3), " (95%PrI: ", 
        round(subset(pSeekDF, Year=="2020")$pPEP_LCI, 3), "-", 
        round(subset(pSeekDF, Year=="2020")$pPEP_UCI, 3), ") in 2020 to ",
-       round(subset(pSeekDF, Year=="2022")$pPEP, 3), " (95%CI: ", 
+       round(subset(pSeekDF, Year=="2022")$pPEP, 3), " (95%PrI: ", 
        round(subset(pSeekDF, Year=="2022")$pPEP_LCI, 3), "-", 
        round(subset(pSeekDF, Year=="2022")$pPEP_UCI, 3), ") in 2022.") 
 
