@@ -9,6 +9,7 @@
 rm(list=ls()) # Clean workspace
 
 library(dplyr)
+library(rgdal)
 library(readr)
 library(tidyverse)
 library(forcats)
@@ -34,8 +35,8 @@ tests <- read.csv("outputs/RADDL_deid.csv") # OrMin confirmed animal cases from 
 IBCM$MUNICIPALITY[grep("Calapan", IBCM$MUNICIPALITY)] <- "Calapan City"
 IBCM$Loc_ID <- paste0(IBCM$PROVINCE, "-", IBCM$MUNICIPALITY)
 
-# MPH focus
-OMPH_risk <- read.csv("data/OMPH_risk_data.csv") # OMPH data for extrapolation - @Catherine - where is the code to produce this?
+# OMPH ABTC focus
+OMPH_risk <- read.csv("data/OMPH_risk_data.csv") # OMPH risk data for extrapolation - @Catherine - where is the code to produce this?
 OMPH <- read.csv("outputs/OMPH_deid.csv") # OMPH data for extrapolation 
 
 # Geographic & population data 
@@ -83,10 +84,10 @@ locs <- unique(municipality$Loc_ID[which(municipality$NAME_1 %in% "Oriental Mind
 ###############################################################################
 # PHO data
 # PHO bite patient stats for study period (2020-2022)
-Total_patients <- sum(subset(PHO_patients, Year %in% 2020:2022)$bite_patients) # patients from 2020-2022
-Avg_patients_year <- mean(subset(PHO_patients, Year %in% 2020:2022)$bite_patients) # average per year
-Avg_patients_month <- Avg_patients_year / 12
-Overall_bite_inc_year <- Avg_patients_year * 100000/ pop
+Total_patients <- sum(subset(PHO_patients, Year %in% 2020:2022)$bite_patients) # 33,947 patients from 2020-2022
+Avg_patients_year <- mean(subset(PHO_patients, Year %in% 2020:2022)$bite_patients) # 11,316 average per year
+Avg_patients_month <- Avg_patients_year / 12 # 943 average patients per month 
+Overall_bite_inc_year <- Avg_patients_year * 100000/ pop # 1,246 per 100k incidence of patients seeking PEP 
 
 # Summary characteristics for study period (2020-2022) fro PHO data
 PHO_3y_summary <- PHO_patients %>% 
@@ -97,12 +98,15 @@ PHO_3y_summary <- PHO_patients %>%
     other = species_other*100 / Total_patients,
     ERIG = ERIG_given,
     CatIII = CAT_III,
-    pc_ERIG = ERIG_given*100/ Total_patients,
-    pc_ERIG_catIII = ERIG_given*100/ CAT_III)
+    pc_ERIG = ERIG_given*100/ Total_patients, # % total bites receiving ERIG
+    pc_ERIG_catIII = ERIG_given*100/ CAT_III) # % Cat III bites receiving ERIG 
 PHO_3y_summary
+  # Biting animals: 67.8% dogs,  31.5% cats, 0.74% other species 
+  # 79.6% of total patients received ERIG 
+  # 15.5% of Cat III patients received ERIG                                       
 
-# Total IBCM records for first visit patients
-IBCM_tot <- IBCM %>% dplyr::summarise(n=n()); IBCM_tot
+# Total IBCM records for first-visit patients
+IBCM_tot <- IBCM %>% dplyr::summarise(n=n()); IBCM_tot # 11,501 records
 
 # Percent of PHO recorded bites in IBCM database
 IBCM_tot*100 / Total_patients # 33.88%
