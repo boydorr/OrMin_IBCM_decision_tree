@@ -25,7 +25,6 @@ library(patchwork)
 PHO_patients <- read.csv("data/PHO_annual_bite_data.csv") # All bite patients from PHO records 
 deaths <- read.csv("outputs/deaths_deid.csv", stringsAsFactors = FALSE) # Death data de-identified 
 IBCM <- read.csv("outputs/ibcm_deid.csv") # IBCM patient records - de-identified
-investigations <- read.csv("outputs/invest_deid.csv") # IBCM animal investigations - de-identified
 tests <- read.csv("outputs/RADDL_deid.csv") # OrMin confirmed animal cases from RADDL 
 # Fix IBCM data for mapping
 IBCM$MUNICIPALITY[grep("Calapan", IBCM$MUNICIPALITY)] <- "Calapan City"
@@ -49,7 +48,7 @@ villages <- readOGR("data/GIS/", "PHL_village", stringsAsFactors=FALSE)
 municipality_loc <- read.csv(paste0("data/GIS/","PHL_municipality_centroids.csv")); dim(municipality_loc) # 1647
 village_loc <- read.csv(paste0("data/GIS/","PHL_village_centroids.csv")); dim(village_loc) # 41933
 
-# transform to dataframe
+# Transform to dataframe
 shp_to_df <- function(shapefile){
   shapefile$id <- rownames(shapefile@data)
   shapefile_df <- fortify(shapefile, region = "id")
@@ -178,7 +177,7 @@ IBCM_yr <- IBCM %>%
                    high_risk = length(which(risk == "high")),
                    unk_risk = length(which(risk == "unknown"))) 
 
-# Summarise deaths by year
+# Summarize deaths by year
 death_summary <- deaths %>% 
   mutate(date = as.Date(DATE_DIED),
          year = year(date)) %>% 
@@ -198,7 +197,7 @@ Mun_RISK <- IBCM %>%
                    unk_risk = length(which(risk == "unknown"))) 
 Mun_RISK
 
-# Summarise deaths by municipality
+# Summarize deaths by municipality
 death_municipality <- deaths %>% 
   mutate(date = as.Date(DATE_DIED),
          year = year(date),
@@ -208,46 +207,14 @@ death_municipality <- deaths %>%
   dplyr::summarise(n = n()) 
 Mun_RISK$deaths <- subset(death_municipality)$n
 
-###############################################################################
-####  Summarize Animal Investigations ####
-###############################################################################
-# Investigations for OrMIN only 
-table(investigations$GII_NUMBER_OF_PEOPLE_BITTEN, useNA = "always") # 101 animals that bite >1 person 
-table(investigations$MUNICIPALITY, useNA = "always") # investigations by municipality 
-table(investigations$SAMPLE_WAS_COLLECTED_LATERAL_FLOW_TEST_DONE, useNA = "always") # 34 LFD completed 
-table(investigations$SAMPLE_WAS_COLLECTED_LATERAL_FLOW_TEST_OUTCOME, useNA = "always") # 18 positive LFD 
-table(investigations$GII_ANIMAL_OWNED, useNA = "always") # 75 owned  :  23 not owned  :  23 unknown 
-table(investigations$ANIMAL_OUTCOME, useNA = "always") # 54 alive  :  51 dead  :  16 not found 
-
-# Summarise animal cases by year
-case_summary <- investigations %>% 
-  mutate(date = as.Date(DATE_OF_INVESTIGATION),
-         year = year(date)) %>% 
-  group_by(year) %>% 
-  dplyr::summarise(n = length(which(SAMPLE_WAS_COLLECTED_LATERAL_FLOW_TEST_OUTCOME == "positive"))) 
-IBCM_yr$positive <- subset(case_summary, year %in% 2020:2022)$n
-
-test_summary <- tests %>% 
-  mutate(date = as.Date(as.POSIXlt(strptime(as.character(DATE_SUBMITTED), "%m/%d/%Y"))),
-         year = year(date)) %>% 
-  group_by(year) %>% 
-  dplyr::summarise(n = n())
-
-# Summarise cases by municipality
-case_municipality <- investigations %>% 
-  filter(!is.na(MUNICIPALITY)) %>% # remove the NAs
-  mutate(MUNICIPALITY = factor(MUNICIPALITY, levels = mun)) %>% 
-  group_by(MUNICIPALITY, .drop = F) %>% 
-  dplyr::summarise(n = n(),
-                   positive = length(which(SAMPLE_WAS_COLLECTED_LATERAL_FLOW_TEST_OUTCOME == "positive"))) 
-
+# Summarize animal cases by municipality
 test_municipality <- tests %>% 
   filter(!is.na(MUNICIPALITY)) %>% # remove the NAs
   mutate(MUNICIPALITY = factor(MUNICIPALITY, levels = mun)) %>% 
   group_by(MUNICIPALITY, .drop = F) %>% 
   dplyr::summarise(n = n())
 
-# Save all the ibcm summary data
+# Save all the IBCM summary data
 write.csv(IBCM_yr, "outputs/ibcm_summary.csv", row.names = FALSE) # Save to use in decision tree calculations
 write.csv(Mun_RISK, "outputs/municipality_summary.csv", row.names = FALSE) # Save to use in decision tree calculations
 
@@ -333,7 +300,7 @@ for (i in 1:length(years)){
   lab_y <- lab_cases_yr_ormin %>% filter(year == years[i])
   cases_y <- rabies_yr_ormin %>% filter(year == years[i])
   
-  # prep for map
+  # Prep for map
   risk_municipality <- municipality[which(municipality$Loc_ID %in% risk_exp$Loc_ID),] # Subset shp for high-risk / rabies locations
   risk_municipality <- merge(risk_municipality, risk_exp, by = 'Loc_ID', duplicateGeoms = TRUE) # Merge in summary data to df
   risk_municipality_df <- shp_to_df(risk_municipality)
@@ -372,6 +339,7 @@ for (i in 1:length(years)){
       geom_point(data = lab_y, aes(x = Lon, y = Lat), shape = 21, fill = "red", colour = "white", size = 2, alpha = 1) +
       geom_point(data = deaths_y, aes(x = Lon, y = Lat), shape = 21, fill = "black", colour = "white", size = 2) +
       theme_void() + theme(legend.position= "none") +
+      coord_fixed(xlim=c(120.3,121.6), ylim=c(12.2, 13.6)) 
     risk_map_inc_2021
   }
   
@@ -394,7 +362,7 @@ for (i in 1:length(years)){
   }
 }
 
-map_panel =  (risk_map_inc_2020 + risk_map_inc_2021 + risk_map_inc_2022)
+map_panel = (risk_map_inc_2020 + risk_map_inc_2021 + risk_map_inc_2022)
 
 fig3_combined <- ggarrange(risk_ts_plot,
           map_panel, 
