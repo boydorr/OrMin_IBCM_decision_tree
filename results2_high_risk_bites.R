@@ -213,6 +213,7 @@ test_municipality <- tests %>%
   mutate(MUNICIPALITY = factor(MUNICIPALITY, levels = mun)) %>% 
   group_by(MUNICIPALITY, .drop = F) %>% 
   dplyr::summarise(n = n())
+Mun_RISK$positive_dogs <- subset(test_municipality)$n
 
 # Save all the IBCM summary data
 write.csv(IBCM_yr, "outputs/ibcm_summary.csv", row.names = FALSE) # Save to use in decision tree calculations
