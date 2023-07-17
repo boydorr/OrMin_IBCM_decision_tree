@@ -2,10 +2,6 @@
 #####  Results - Summary of HIGH-RISK bites   ######
 #################################################################
 
-# TO DO 
-# CS to check if deid data is correct and uptodate (Katie wrote code and tested on older data)
-# Remove any investigation code if not being used to simplify repo
-
 rm(list=ls()) # Clean workspace
 
 library(dplyr)
@@ -27,16 +23,15 @@ library(patchwork)
 
 # Import data - PHO, IBCM, & RADDL
 PHO_patients <- read.csv("data/PHO_annual_bite_data.csv") # All bite patients from PHO records 
-deaths <- read.csv("outputs/deaths_deid.csv", stringsAsFactors = FALSE) # Deidentified death data
-IBCM <- read.csv("outputs/ibcm_deid.csv") # IBCM patient records - deidentified
-investigations <- read.csv("outputs/invest_deid.csv") # IBCM animal investigations - deidentified
+deaths <- read.csv("outputs/deaths_deid.csv", stringsAsFactors = FALSE) # Death data de-identified 
+IBCM <- read.csv("outputs/ibcm_deid.csv") # IBCM patient records - de-identified
+investigations <- read.csv("outputs/invest_deid.csv") # IBCM animal investigations - de-identified
 tests <- read.csv("outputs/RADDL_deid.csv") # OrMin confirmed animal cases from RADDL 
 # Fix IBCM data for mapping
 IBCM$MUNICIPALITY[grep("Calapan", IBCM$MUNICIPALITY)] <- "Calapan City"
 IBCM$Loc_ID <- paste0(IBCM$PROVINCE, "-", IBCM$MUNICIPALITY)
 
-# OMPH ABTC focus
-OMPH_risk <- read.csv("data/OMPH_risk_data.csv") # OMPH risk data for extrapolation - @Catherine - where is the code to produce this?
+# OMPH focus
 OMPH <- read.csv("outputs/OMPH_deid.csv") # OMPH data for extrapolation 
 
 # Geographic & population data 
@@ -87,7 +82,7 @@ locs <- unique(municipality$Loc_ID[which(municipality$NAME_1 %in% "Oriental Mind
 Total_patients <- sum(subset(PHO_patients, Year %in% 2020:2022)$bite_patients) # 33,947 patients from 2020-2022
 Avg_patients_year <- mean(subset(PHO_patients, Year %in% 2020:2022)$bite_patients) # 11,316 average per year
 Avg_patients_month <- Avg_patients_year / 12 # 943 average patients per month 
-Overall_bite_inc_year <- Avg_patients_year * 100000/ pop # 1,246 per 100k incidence of patients seeking PEP 
+Overall_bite_inc_year <- Avg_patients_year * 100000/ pop # 1,246 per 100k overall patient seeking incidence 
 
 # Summary characteristics for study period (2020-2022) fro PHO data
 PHO_3y_summary <- PHO_patients %>% 
@@ -96,55 +91,20 @@ PHO_3y_summary <- PHO_patients %>%
     dog = species_dog *100 / Total_patients, # % biting species
     cat = species_cat *100 / Total_patients,
     other = species_other*100 / Total_patients,
-    ERIG = ERIG_given,
+    ERIG = ERIG_given, 
     CatIII = CAT_III,
-    pc_ERIG = ERIG_given*100/ Total_patients, # % total bites receiving ERIG
+    pc_ERIG = ERIG_given*100/ Total_patients, # % total bites receiving ERIG 
     pc_ERIG_catIII = ERIG_given*100/ CAT_III) # % Cat III bites receiving ERIG 
-PHO_3y_summary
+PHO_3y_summary 
   # Biting animals: 67.8% dogs,  31.5% cats, 0.74% other species 
   # 79.6% of total patients received ERIG 
-  # 15.5% of Cat III patients received ERIG                                       
+  # 15.5% of Cat III patients received ERIG 
 
-# Total IBCM records for first-visit patients
-IBCM_tot <- IBCM %>% dplyr::summarise(n=n()); IBCM_tot # 11,501 records
+# Total IBCM records for first visit patients
+IBCM_tot <- IBCM %>% dplyr::summarise(n=n()); IBCM_tot # 12,640 
 
 # Percent of PHO recorded bites in IBCM database
-IBCM_tot*100 / Total_patients # 33.88%
-
-###############################################################################
-##** Summarize OMPH risk data for extrapolation*
-## % high-risk bites per year at OMPH 
-years = as.character(2020:2022)
-n <- high_risk_pc <- high_unk_risk_pc <- numeric(length = length(years))
-
-for (i in 1:length(years)){
-  n[i] <- subset(OMPH_risk, year_visit == years[i] & risk == "all")$n
-  high_risk_pc[i] <- subset(OMPH_risk, year_visit == years[i] & risk == "high")$n/n[i]
-  high_unk_risk_pc[i] <- subset(OMPH_risk, year_visit == years[i] & risk == "high_max")$n/n[i]
-}
-p_high_risk <- mean(high_risk_pc); p_high_risk ## Average proportion high risk = 0.01212938
-p_high_risk_max <- mean(high_unk_risk_pc); p_high_risk_max ## Average proportion high/unknown risk = 0.04177898
-
-Total_patients/3 * p_high_risk # 137 high-risk bite patients
-Total_patients/3 * p_high_risk_max # 473 high + unknown risk bite patients 
-subset(PHO_patients, Year %in% 2020:2022)$bite_patients * p_high_risk
-subset(PHO_patients, Year %in% 2020:2022)$bite_patients * p_high_risk_max
-
-###############################################################################
-### Alternative risk assessment variable
-OMPH$risk <- "low"
-OMPH$risk[which(OMPH$RISK_ASSESSMENT=="suspicious_for_rabies" | OMPH$ALIVE=="no" | OMPH$SUSPECT=="yes")] <- "high"
-OMPH$risk[which(OMPH$RISK_ASSESSMENT=="unknown" | OMPH$ALIVE=="unknown")] <- "unknown" 
-
-OMPH_yr <- OMPH %>%
-  group_by(year_visit) %>%
-  dplyr::summarise(bites =n(), 
-                   dog_bites = length(which(ANIMAL == "dog")),
-                   high_risk_dogs = length(which(risk == "high" & ANIMAL == "dog")),
-                   high_risk = length(which(risk == "high")),
-                   unk_risk = length(which(risk == "unknown"))) 
-p_high_risk_omph <- mean(OMPH_yr$high_risk_dogs/OMPH_yr$bites); p_high_risk ## Average proportion high risk = 0.01212938
-p_high_risk_max_omph <- mean((OMPH_yr$high_risk + OMPH_yr$unk_risk)/OMPH_yr$bites); p_high_risk_max ## Average proportion high/unknown risk = 0.04177898
+IBCM_tot*100 / Total_patients # 37.2%
 
 ###############################################################################
 ######## RISK ##########
@@ -159,30 +119,55 @@ risk_factor = ordered(levels(factor(IBCM$risk)), levels = c("low", "unknown", "h
 OrMIN_RISK <- IBCM %>% 
   group_by(risk) %>%
   dplyr::summarize(
-    n=n(), # high-253 : unknown-331 : low-10,917
+    n=n(), # high-312 : unknown-403 : low-11,925
     male = length(which(SEX == "male")), ## Sex of high-risk bite patients (demographics)  
-    female = length(which(SEX == "female")), # HIGH-RISK: 132 female & 121 male 
+    female = length(which(SEX == "female")), # HIGH-RISK: 164 female & 148 male 
     dog = length(which(ANIMAL == "dog")), ## Biting animal for high-risk bites 
-    cat = length(which(ANIMAL == "cat")), # HIGH RISK: dog-199, cat-54
+    cat = length(which(ANIMAL == "cat")), # HIGH RISK: dog-240, cat-72
     I = length(which(CATEGORY == "I")), ## Category of exposure for high-risk 
     II = length(which(CATEGORY == "II")), 
-    III = length(which(CATEGORY == "III")), # HIGH-RISK: CatI-2, CatII-151, CatIII-100
+    III = length(which(CATEGORY == "III")), # HIGH-RISK: CatI-2, CatII-202, CatIII-108
     dead = length(which(ALIVE == "no")), # Biting animal DEAD
-    dead_unk = length(which(ALIVE == "no"| ALIVE == "unknown")), # HIGH-RISK: dead-227, alive-26
+    dead_unk = length(which(ALIVE == "no"| ALIVE == "unknown")), # HIGH-RISK: dead-259, alive-53
     alive = length(which(ALIVE == "yes")),
     suspect = length(which(SUSPECT == "yes")),
-    suspect_unk = length(which(SUSPECT == "yes"| SUSPECT == "do_not_know")), # HIGH-RISK: yes-17, no-177, do_not_know-59
+    suspect_unk = length(which(SUSPECT == "yes"| SUSPECT == "do_not_know")), # HIGH-RISK: yes-25, no-177, do_not_know-59
     risk_assess_suspect = length(which(RISK_ASSESSMENT == "suspicious_for_rabies")), # Biting animal RISK_ASSESSMENT for rabies 
     risk_assess_sick = length(which(RISK_ASSESSMENT == "sick_not_rabies")),
-    risk_assess_healthy = length(which(RISK_ASSESSMENT == "healthy"))) # suspicious 68,  sick 26,  healthy-159
+    risk_assess_healthy = length(which(RISK_ASSESSMENT == "healthy"))) # suspicious 89,  sick 27,  healthy-196
 OrMIN_RISK 
 
 # Proportion high-risk & unknown-risk bites out of total bites 
-Prop_high_risk <- subset(OrMIN_RISK, risk == "unknown" | risk == "high")$n/sum(OrMIN_RISK$n) 
+Prop_high_risk <- subset(OrMIN_RISK, risk == "unknown" | risk == "high")$n/sum(OrMIN_RISK$n) # 0.0247 high-risk : 0.0319 unknown-risk
 
 # Extrapolate to all patients in Oriental Mindoro from PHO records   
-Total_patients * Prop_high_risk[1]  # 747 high-risk in 3 years Extra_high_risk_3year <- 
-Avg_patients_year * Prop_high_risk[1]  # 249 high-risk per year - Extra_high_risk_per_year <-  
+Total_patients * Prop_high_risk[1]  # 838 high-risk in 3 years Extra_high_risk_3year <- 
+Avg_patients_year * Prop_high_risk[1]  # 279 high-risk per year - Extra_high_risk_per_year <-  
+
+###############################################################################
+##** Summarize OMPH risk data for extrapolation*
+# Total OMPH IBCM patient records for first time visits
+OMPH_tot <- OMPH %>% dplyr::summarise(n=n()); OMPH_tot # 6,055
+
+# Create risk assessment variable for OMPH data 
+OMPH$risk <- "low"
+OMPH$risk[which(OMPH$RISK_ASSESSMENT=="suspicious_for_rabies" | OMPH$ALIVE=="no" | OMPH$SUSPECT=="yes")] <- "high"
+OMPH$risk[which(OMPH$RISK_ASSESSMENT=="unknown" | OMPH$ALIVE=="unknown")] <- "unknown" # patients$SUSPECT=="do_not_know"
+risk_factor = ordered(levels(factor(OMPH$risk)), levels = c("low", "unknown", "high"))
+
+## Summary of bites categorized by RISK at OMPH (only)
+OMPH_risk <- OMPH %>% 
+  group_by(risk) %>%
+  dplyr::summarise(n=n())
+write.csv(OMPH_risk, "outputs/OMPH_risk_data.csv")
+OMPH_risk
+
+# Proportion high-risk & unknown-risk bites out of OMPH records 
+OMPH_p_high_risk <- subset(OMPH_risk, risk == "unknown" | risk == "high")$n/sum(OMPH_risk$n) # 0.00958 high-risk : 0.02742 unknown-risk
+
+# Extrapolate OMPH risk proportions to all patients in Oriental Mindoro in PHO records   
+Total_patients * OMPH_p_high_risk[1]  # 325 high-risk in 3 years 
+Avg_patients_year * OMPH_p_high_risk[1]  # 108 high-risk per year   
 
 # IBCM first visit patients by year 
 IBCM_yr <- IBCM %>%
@@ -196,7 +181,7 @@ IBCM_yr <- IBCM %>%
 # Summarise deaths by year
 death_summary <- deaths %>% 
   mutate(date = as.Date(DATE_DIED),
-          year = year(date)) %>% 
+         year = year(date)) %>% 
   group_by(year) %>% 
   dplyr::summarise(n = n()) 
 IBCM_yr$deaths <- subset(death_summary, year %in% 2020:2022)$n
@@ -228,11 +213,11 @@ Mun_RISK$deaths <- subset(death_municipality)$n
 ###############################################################################
 # Investigations for OrMIN only 
 table(investigations$GII_NUMBER_OF_PEOPLE_BITTEN, useNA = "always") # 101 animals that bite >1 person 
-table(investigations$LOCATION_OF_EVENT_MUNICIPALITY, useNA = "always") # investigations by municipality 
-table(investigations$SAMPLE_WAS_COLLECTED_LATERAL_FLOW_TEST_DONE, useNA = "always") # 17 LFD completed 
-table(investigations$SAMPLE_WAS_COLLECTED_LATERAL_FLOW_TEST_OUTCOME, useNA = "always") # 10 positive LFD 
-table(investigations$GII_ANIMAL_OWNED, useNA = "always") # 61 owned  :  19 not owned  :  21 unknown 
-table(investigations$ANIMAL_OUTCOME, useNA = "always") # 55 alive  :  30 dead   : 16 not found 
+table(investigations$MUNICIPALITY, useNA = "always") # investigations by municipality 
+table(investigations$SAMPLE_WAS_COLLECTED_LATERAL_FLOW_TEST_DONE, useNA = "always") # 34 LFD completed 
+table(investigations$SAMPLE_WAS_COLLECTED_LATERAL_FLOW_TEST_OUTCOME, useNA = "always") # 18 positive LFD 
+table(investigations$GII_ANIMAL_OWNED, useNA = "always") # 75 owned  :  23 not owned  :  23 unknown 
+table(investigations$ANIMAL_OUTCOME, useNA = "always") # 54 alive  :  51 dead  :  16 not found 
 
 # Summarise animal cases by year
 case_summary <- investigations %>% 
@@ -365,8 +350,8 @@ for (i in 1:length(years)){
                         limits=c(0, 40)) +
       geom_polygon(data = municipality_df_ormin, aes(x = long, y = lat, group = group), 
                  fill=NA, color="black", size = 0.2, alpha = 0.3) +
-      geom_point(data = deaths_y, aes(x = Lon, y = Lat), shape = 23, fill = "black", colour = "yellow", size = 2) +
-      geom_point(data = lab_y, aes(x = Lon, y = Lat), shape = 21, fill = "#CC0000", colour = "white", size = 2) +
+      geom_point(data = lab_y, aes(x = Lon, y = Lat), shape = 21, fill = "red", colour = "white", size = 2, alpha = 1) +
+      geom_point(data = deaths_y, aes(x = Lon, y = Lat), shape = 21, fill = "black", colour = "white", size = 2) +
       theme_void() + theme(legend.position= "none") +
       coord_fixed(xlim=c(120.3,121.6), ylim=c(12.2, 13.6))   
     risk_map_inc_2020
@@ -384,10 +369,9 @@ for (i in 1:length(years)){
                           limits=c(0, 40)) +
       geom_polygon(data = municipality_df_ormin, aes(x = long, y = lat, group = group), 
                    fill=NA, color="black", size = 0.2, alpha = 0.3) +
-      geom_point(data = lab_y, aes(x = Lon, y = Lat), shape = 21, colour = "white", fill = "#CC0000", size = 2, alpha = 1) +
-      geom_point(data = deaths_y, aes(x = Lon, y = Lat), shape = 23, fill = "black", colour = "yellow", size = 2) +
-      theme_void() + theme(legend.position="none") +
-      coord_fixed(xlim=c(120.3,121.6), ylim=c(12.2, 13.6))   
+      geom_point(data = lab_y, aes(x = Lon, y = Lat), shape = 21, fill = "red", colour = "white", size = 2, alpha = 1) +
+      geom_point(data = deaths_y, aes(x = Lon, y = Lat), shape = 21, fill = "black", colour = "white", size = 2) +
+      theme_void() + theme(legend.position= "none") +
     risk_map_inc_2021
   }
   
@@ -402,17 +386,18 @@ for (i in 1:length(years)){
                           limits=c(0, 40)) +
       geom_polygon(data = municipality_df_ormin, aes(x = long, y = lat, group = group), 
                    fill=NA, color="black", size = 0.2, alpha = 0.3) +
-      geom_point(data = lab_y, aes(x = Lon, y = Lat), shape = 21, colour = "white", fill = "#CC0000", size = 2, alpha = 1) +
-      geom_point(data = deaths_y, aes(x = Lon, y = Lat), shape = 23, fill = "black", colour = "yellow", size = 2) + # shape 21 better
+      geom_point(data = lab_y, aes(x = Lon, y = Lat), shape = 21, fill = "red", colour = "white", size = 2, alpha = 1) +
+      geom_point(data = deaths_y, aes(x = Lon, y = Lat), shape = 21, fill = "black", colour = "white", size = 2) + 
       theme_void() + # theme(legend.position=c(1,0),legend.justification=c(1,0)) +
       coord_fixed(xlim=c(120.3,121.6), ylim=c(12.2, 13.6))   
     risk_map_inc_2022
   }
 }
+
 map_panel =  (risk_map_inc_2020 + risk_map_inc_2021 + risk_map_inc_2022)
 
 fig3_combined <- ggarrange(risk_ts_plot,
           map_panel, 
           nrow = 2, labels=c("A", "B"), heights = c(1,1.6))
-ggsave("figs/fig3_combined.jpeg", height = 6, width = 9)
+ggsave("figs/fig3_combined.jpeg", height = 7, width = 9)
 
