@@ -1,4 +1,4 @@
-"year_visit","bites","dog_bites","high_risk_dogs","high_risk","unk_risk","deaths","positive"
+"year_visit","bites","dog_bites","high_risk_dogs","high_risk","unk_risk","deaths","positive_dogs"
 2020,3623,2547,71,90,109,9,3
-2021,3924,2775,43,52,113,7,2
-2022,3954,2629,85,111,109,9,13
+2021,3924,2775,43,52,113,7,7
+2022,5093,3379,126,170,181,9,18

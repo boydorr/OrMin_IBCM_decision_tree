@@ -1,16 +1,16 @@
-"MUNICIPALITY","bites","dog_bites","high_risk_dogs","high_risk","unk_risk","deaths"
-"Baco",1030,667,7,8,23,0
-"Bansud",491,358,9,14,9,1
-"Bongabong",327,253,29,31,12,6
-"Bulalacao",554,361,14,17,4,1
-"Calapan City",3667,2419,24,37,97,0
-"Gloria",742,532,13,19,11,2
-"Mansalay",1168,873,38,46,55,5
-"Naujan",827,514,18,27,52,0
-"Pinamalayan",1387,1002,27,33,28,5
-"Pola",334,239,5,11,12,4
-"Puerto Galera",356,250,11,15,49,0
-"Roxas",736,540,39,44,24,1
-"San Teodoro",635,437,1,2,16,0
-"Socorro",217,143,1,2,6,0
-"Victoria",166,113,4,6,5,0
+"MUNICIPALITY","bites","dog_bites","high_risk_dogs","high_risk","unk_risk","deaths","positive_dogs"
+"Baco",1030,667,7,8,23,0,7
+"Bansud",491,358,9,14,9,1,0
+"Bongabong",327,253,29,31,12,6,2
+"Bulalacao",554,361,14,17,4,1,0
+"Calapan City",3667,2419,24,37,97,0,2
+"Gloria",742,532,13,19,11,2,1
+"Mansalay",1168,873,38,46,55,5,4
+"Naujan",827,514,18,27,52,0,2
+"Pinamalayan",1387,1002,27,33,28,5,1
+"Pola",334,239,5,11,12,4,1
+"Puerto Galera",356,250,11,15,49,0,4
+"Roxas",736,540,39,44,24,1,3
+"San Teodoro",635,437,1,2,16,0,0
+"Socorro",217,143,1,2,6,0,0
+"Victoria",166,113,4,6,5,0,1
