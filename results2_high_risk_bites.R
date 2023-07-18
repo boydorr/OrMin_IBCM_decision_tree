@@ -326,7 +326,7 @@ for (i in 1:length(years)){
                         low="white", high="#cc0000",
                         limits=c(0, 40)) +
       geom_polygon(data = municipality_df_ormin, aes(x = long, y = lat, group = group), 
-                 fill=NA, color="black", size = 0.2, alpha = 0.3) +
+                 fill=NA, color="black", linewidth = 0.2, alpha = 0.3) +
       geom_point(data = lab_y, aes(x = Lon, y = Lat), shape = 21, fill = "red", colour = "white", size = 2, alpha = 1) +
       geom_point(data = deaths_y, aes(x = Lon, y = Lat), shape = 21, fill = "black", colour = "white", size = 2) +
       theme_void() + theme(legend.position= "none") +
@@ -345,7 +345,7 @@ for (i in 1:length(years)){
                           low="white", high="#cc0000",
                           limits=c(0, 40)) +
       geom_polygon(data = municipality_df_ormin, aes(x = long, y = lat, group = group), 
-                   fill=NA, color="black", size = 0.2, alpha = 0.3) +
+                   fill=NA, color="black", linewidth = 0.2, alpha = 0.3) +
       geom_point(data = lab_y, aes(x = Lon, y = Lat), shape = 21, fill = "red", colour = "white", size = 2, alpha = 1) +
       geom_point(data = deaths_y, aes(x = Lon, y = Lat), shape = 21, fill = "black", colour = "white", size = 2) +
       theme_void() + theme(legend.position= "none") +
@@ -363,7 +363,7 @@ for (i in 1:length(years)){
                           low="white", high="#cc0000",
                           limits=c(0, 40)) +
       geom_polygon(data = municipality_df_ormin, aes(x = long, y = lat, group = group), 
-                   fill=NA, color="black", size = 0.2, alpha = 0.3) +
+                   fill=NA, color="black", linewidth = 0.2, alpha = 0.3) +
       geom_point(data = lab_y, aes(x = Lon, y = Lat), shape = 21, fill = "red", colour = "white", size = 2, alpha = 1) +
       geom_point(data = deaths_y, aes(x = Lon, y = Lat), shape = 21, fill = "black", colour = "white", size = 2) + 
       theme_void() + # theme(legend.position=c(1,0),legend.justification=c(1,0)) +
