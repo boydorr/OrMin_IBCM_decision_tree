@@ -2,8 +2,9 @@
 #####  Results - Summary of HIGH-RISK bites   ######
 #################################################################
 
-rm(list=ls()) # Clean workspace
+rm(list=ls()) # Clean environment
 
+# Import libraries
 library(dplyr)
 library(rgdal)
 library(readr)
@@ -168,6 +169,7 @@ OMPH_p_high_risk <- subset(OMPH_risk, risk == "unknown" | risk == "high")$n/sum(
 Total_patients * OMPH_p_high_risk[1]  # 325 high-risk in 3 years 
 Avg_patients_year * OMPH_p_high_risk[1]  # 108 high-risk per year   
 
+## Create IBCM, PHO death, and RADDL summary csv files 
 # IBCM first visit patients by year 
 IBCM_yr <- IBCM %>%
   group_by(year_visit) %>%

@@ -1,9 +1,9 @@
 ######################################################################
 ### Results - Probability of seeking PEP after rabies exposure ###
 ######################################################################
-#**Stochastic - outputs will vary slightly from Results published*
+#**Stochastic - outputs may vary slightly from Results published*
 
-rm(list=ls())
+rm(list=ls()) # Clean environment 
 
 # Import libraries, source functions and data
 library(tidyverse)
