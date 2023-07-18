@@ -185,6 +185,14 @@ death_summary <- deaths %>%
   dplyr::summarise(n = n()) 
 IBCM_yr$deaths <- subset(death_summary, year %in% 2020:2022)$n
 
+# Summarize animal cases by year
+test_summary <- tests %>% 
+  mutate(date = as.Date(DATE_SUBMITTED),
+         year = year(date)) %>% 
+  group_by(year) %>% 
+  dplyr::summarise(n = n())
+IBCM_yr$positive_dogs <- subset(test_summary, year %in% 2020:2022)$n
+
 ### IBCM risk summary for bite patients by municipality (15 in total)
 Mun_RISK <- IBCM %>%
   filter(!is.na(MUNICIPALITY)) %>% # remove the 3 NAs
@@ -214,6 +222,7 @@ test_municipality <- tests %>%
   group_by(MUNICIPALITY, .drop = F) %>% 
   dplyr::summarise(n = n())
 Mun_RISK$positive_dogs <- subset(test_municipality)$n
+Mun_RISK
 
 # Save all the IBCM summary data
 write.csv(IBCM_yr, "outputs/ibcm_summary.csv", row.names = FALSE) # Save to use in decision tree calculations

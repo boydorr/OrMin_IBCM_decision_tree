@@ -64,13 +64,13 @@ TableDF <- rbind(TableDF, DF)
 fix_avgs = which(TableDF$Year == "Avg_year_2020_to_2022")
 TableDF_avg <- TableDF[fix_avgs,] 
 TableDF_avg$Recorded_human_deaths <- round(study_avg$deaths_rec, digits = 1)
-TableDF_avg$Bites_under_15 <- paste0(round(study_avg$age_under_15, digits = 1), "  (", 
+TableDF_avg$Bites_under_15 <- paste0(round(study_avg$age_under_15, digits = 0), "  (", 
                                      round(study_avg$age_under_15 *100/ study_avg$bite_patients, digits = 1), ")")
-TableDF_avg$Category_II_bites <- paste0(round(study_avg$CAT_II, digits = 1), "  (", 
+TableDF_avg$Category_II_bites <- paste0(round(study_avg$CAT_II, digits = 0), "  (", 
                                         round(study_avg$CAT_II *100/ study_avg$bite_patients, digits = 1), ")")
-TableDF_avg$Biting_animal_cat <- paste0(round(study_avg$species_cat, digits = 1), "  (", 
+TableDF_avg$Biting_animal_cat <- paste0(round(study_avg$species_cat, digits = 0), "  (", 
                                      round(study_avg$species_cat *100/ study_avg$bite_patients, digits = 1), ")")
-TableDF_avg$Biting_animal_other <- paste0(round(study_avg$species_other, digits = 1), "  (", 
+TableDF_avg$Biting_animal_other <- paste0(round(study_avg$species_other, digits = 0), "  (", 
                                         round(study_avg$species_other *100/ study_avg$bite_patients, digits = 1), ")")
 
 # Transpose columns into the rows 
@@ -83,5 +83,5 @@ Table_summary$names <- c("Year", "Recorded human deaths", "Total bite patients",
                          "ERIG (% of Category III patients)", "Dog bite (%)", "Cat bite (%)", "Bite by other animal (%)")
  
 # Save table showing PHO Overall Bite Patient summary for Results 
-write.csv(Table_summary, "outputs/Table_3_Characteristics_bite_patients.csv")
+write.csv(Table_summary[,c(6,1,2,3,4,5)], "outputs/Table_3_Characteristics_bite_patients.csv")
 
