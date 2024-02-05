@@ -63,3 +63,13 @@ Est_overall_costs$year <- "overall"
 write.csv(t(rbind(Cost_PEPDataFRAME, Est_overall_costs)), 
           "outputs/Results_Cost_Analysis.csv")
 
+
+# Back of the envelope economic costs
+humans <- 113959168 
+HDR <- 11
+dogs <- humans/HDR
+vax_cov <- 0.7
+dog_vaccine <- 0.25
+dogs * vax_cov * dog_vaccine #  i.e. A fraction of PEP! 
+cost_per_dog_vax <- 2
+dogs * vax_cov * cost_per_dog_vax # STILL MUCH CHEAPER
