@@ -1,8 +1,7 @@
-# Using Integrated Bite Case Management to estimate the burden of rabies and assess surveillance performance in Oriental Mindoro, Philippines 
-Public repo for C Swedberg OHIR ms
+# Using Integrated Bite Case Management to estimate the burden of rabies and evaluate surveillance in Oriental Mindoro, Philippines
+Public repository for: Swedberg C, Miranda MEG, Bautista C, Anderson D, Basa-Tulio M, Cruz VDD, Kundegorski M, Maestro J, Manalo D, Maniszewska K, Manzanilla DR, Mazeri S, Mellanby RJ, Pablo-Abarquez S, Quiambao B, Telmo SVM, Trotter C, Yuson M, & Hampson K.
 
-Catherine to complete further details if manuscript accepted and before publication
-
-Authors: Catherine Swedberg, Mary Elizabeth G. Miranda, Criselda Bautista, David Anderson, Marife Basa-Tulio,  Nai Rui Chng, Van Denn D. Cruz, Mikolaj Kundegorski1, Jobin Maestro, Daria Manalo, Klaudyna Maniszewska, Duane R. Manzanilla, Stella Mazeri, Richard J. Mellanby, Sheryl Pablo-Abarquez, Beatriz Quiambao, Shynee Vee M. Telmo, Caroline Trotter, Mirava Yuson, and Katie Hampson.
+One Health Implement Res 2023;3:77-96. [10.20517/ohir.2023.02
+](https://www.oaepublish.com/articles/ohir.2023.02)
 
 This repository contains all the code and de-identified data in this study.
